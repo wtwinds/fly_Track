@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3 class="fw-bold mb-5 mt-3 text-center">Dashboard</h3>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{category}} text-center">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<div class="row justify-content-center text-center">
+
+    <!-- Check In -->
+    <div class="col-md-5 mb-4">
+        <div class="card shadow border-0 h-100 p-5 dashboard-card" onclick="location.href='/checkin'">
+            <h5 class="fw-bold">
+                Check In Luggage
+                <!-- <i class="bi bi-arrow-right ms-2"></i> -->
+            </h5>
+        </div>
+    </div>
+
+    <!-- Lost -->
+    <div class="col-md-5 mb-4">
+        <div class="card shadow border-0 h-100 p-5 dashboard-card" onclick="location.href='/report'">
+            <h5 class="fw-bold">
+                Report Lost Baggage
+            </h5>
+        </div>
+    </div>
+
+</div>
+<style>
+    .dashboard-card {
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}

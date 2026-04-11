@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h4 class="fw-bold mb-4">Check-in Luggage</h4>
+<div class="row">
+    <!-- Left form -->
+    <div class="col-md-6">
+        <form method="POST">
+            <div class="mb-3">
+                <label>Passenger Name</label>
+                <input type="text" name="name" class="form-control" value="{{form.name}}" required />
+            </div>
+
+            <div class="mb-3">
+                <label>Flight Number</label>
+                <input type="text" name="flight" class="form-control" value="{{form.flight}}" placeholder="EX:AI202"
+                    required />
+            </div>
+
+            <div class="mb-3">
+                <label>Destination</label>
+                <input type="text" name="destination" class="form-control" value="{{form.destination}}" required />
+            </div>
+
+            <div class="mb-3">
+                <label>Baggage Weight</label>
+                <input type="number" name="weight" class="form-control" value="{{form.weight}}" required />
+            </div>
+
+            <div class="mb-3">
+                <label>Contact Number</label>
+                <input type="text" name="contact" class="form-control" value="{{form.contact}}" required />
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="reset" class="btn btn-secondary" onclick="clearForm()">Reset</button>
+                <button class="btn btn-primary">Generate Bag Tag</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Right result -->
+    <div class="col-md-6 text-center">
+        {% if bag_id %}
+        <img src="{{image}}" class="img-fluid mb-3" style="max-height: 200px;">
+        <h5 class="fw-bold">Baggage ID</h5>
+        <p class="fs-5">{{bag_id}}</p>
+
+        <p class="text-success fw-bold">Tag Generated Successfully</p>
+        {% endif %}
+    </div>
+</div>
+<script>
+    function clearForm() {
+        window.location.href = "/checkin";
+    }
+</script>
+{% endblock %}

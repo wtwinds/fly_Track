@@ -1,0 +1,94 @@
+<nav class="navbar shadow-sm px-3" style="background-color: #f1f3f5;">
+
+    <div class="container-fluid d-flex align-items-center justify-content-between">
+
+        <!-- LEFT: Hamburger + Title -->
+        <div class="d-flex align-items-center gap-3">
+
+            {% if session.get('user') %}
+            <!-- Hamburger -->
+            <button class="btn" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <i class="bi bi-list fs-3"></i>
+            </button>
+            {% endif %}
+
+            <!-- Logo + Title -->
+            <span class="fw-bold fs-5 d-flex align-items-center gap-2">
+                <i class="bi bi-airplane-fill"></i> FlyTrack
+            </span>
+
+        </div>
+
+        <!-- RIGHT: User + Back + Logout -->
+        <div class="d-flex align-items-center gap-2">
+
+            {% if session.get('user') %}
+
+            <!-- User -->
+            <span class="fw-semibold text-dark">
+                <i class="bi bi-person-circle"></i> {{ session.get('user') }}
+            </span>
+
+            <!-- Back -->
+            {% if request.path != '/dashboard' %}
+            <a href="/dashboard" class="btn btn-outline-secondary btn-sm">
+                Dashboard
+            </a>
+            {% endif %}
+
+            <!-- Logout -->
+            <a href="/logout" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</nav>
+
+<!-- ✅ SIDEBAR (OFFCANVAS) -->
+{% if session.get('user') %}
+<div class="offcanvas offcanvas-start shadow-lg" tabindex="-1" id="sidebar" style="width: 250px;">
+
+    <div class="offcanvas-header">
+        <h5 class="fw-bold">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+
+    <div class="offcanvas-body">
+
+        <div class="list-group">
+
+            <!-- Flightwise -->
+            <a href="/baggage-list"
+                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                Flightwise baggage list
+
+            </a>
+
+            <!-- Staff -->
+            <a href="/staff"
+                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                Staff
+
+            </a>
+
+            <a href="/history"
+                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                Check-in Luggage History
+            </a>
+
+            <a href="/lost-history"
+                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                Lost Baggage History
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+{% endif %}
