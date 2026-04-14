@@ -13,7 +13,7 @@ db = client['flyTrack']
 users = db['users']
 baggage = db['baggage']
 lost_baggage = db['lost_baggage']
-
+pnr_data = db['pnr_data']
 
 # ================= LOGIN =================
 @app.route('/', methods=['GET', 'POST'])
@@ -76,7 +76,7 @@ def dashboard():
 # ================= AUTO PNR =================
 @app.route('/get-pnr/<pnr>')
 def get_pnr(pnr):
-    data = baggage.find_one({"PNR Number": pnr.upper()})
+    data = pnr_data.find_one({"PNR Number": pnr.upper()})
 
     if data:
         return jsonify({
@@ -90,7 +90,6 @@ def get_pnr(pnr):
         })
     return jsonify({"status": False})
 
-
 # ================= CHECKIN =================
 @app.route('/checkin', methods=['GET', 'POST'])
 def checkin():
@@ -98,73 +97,54 @@ def checkin():
         return redirect('/')
 
     if request.method == 'POST':
-        form_data = {
-            "pnr": request.form['pnr'].upper(),
-            "name": request.form['name'],
-            "flight": request.form['flight'],
-            "destination": request.form['destination'],
-            "contact": request.form['contact'],
-            "bags": int(request.form['bags']),
-            "weight": int(request.form['weight'])
-        }
 
-        # Flight validation
-        if not re.match(r'^[A-Z]{2}\d{3,4}$', form_data['flight']):
-            flash("Invalid Flight Number Format (EX: AI202)", "danger")
-            return redirect('/checkin')
+        pnr = request.form['pnr'].upper()
 
-        # Bag limit
-        if form_data['bags'] > 2:
-            flash("Maximum 2 bags allowed!", "danger")
-            return redirect('/checkin')
+        # GET FROM pnr_data (NOT baggage)
+        pnr_data_doc = pnr_data.find_one({"PNR Number": pnr})
 
-        # Weight validation
-        if form_data['weight'] > 30:
-            flash("Total weight cannot exceed 30kg!", "danger")
-            return redirect('/checkin')
-
-        # Already checked?
-        existing = baggage.find_one({
-            "PNR Number": form_data["pnr"],
-            "bag_id": {"$exists": True}
-        })
-
-        if existing:
-            flash("Bag already generated for this PNR!", "warning")
-            return redirect('/checkin')
-
-        # Generate Bag ID
-        bag_id = "BAG" + form_data['flight'][-3:] + form_data['contact'][-4:]
-
-        # ✅ UPDATE DATA
-        result = baggage.update_one(
-            {"PNR Number": form_data["pnr"]},
-            {
-                "$set": {
-                    "user": session['user'],
-                    "bags": form_data['bags'],
-                    "weight": form_data['weight'],
-                    "bag_id": bag_id,
-                    "checked_in": True
-                }
-            }
-        )
-
-        # ❗ PNR not found
-        if result.matched_count == 0:
+        if not pnr_data_doc:
             flash("PNR not found!", "danger")
             return redirect('/checkin')
 
-        flash(f"Bag Tag Generated Successfully! ID: {bag_id}", "success")
+        # SAME USER SAME PNR BLOCK
+        existing = baggage.find_one({
+            "PNR Number": pnr,
+            "user": session['user']
+        })
+
+        if existing:
+            flash("You already checked-in this PNR!", "warning")
+            return redirect('/checkin')
+
+        # FORM DATA
+        bags = int(request.form['bags'])
+        weight = int(request.form['weight'])
+
+        # BAG ID
+        bag_id = "BAG" + pnr_data_doc['Flight Number'][-3:] + pnr_data_doc['Contact Number'][-4:]
+
+        # INSERT ONLY USER DATA
+        baggage.insert_one({
+            "PNR Number": pnr,
+            "Passenger Name": pnr_data_doc.get("Passenger Name"),
+            "Flight Number": pnr_data_doc.get("Flight Number"),
+            "Destination": pnr_data_doc.get("Destination"),
+            "Contact Number": pnr_data_doc.get("Contact Number"),
+            "user": session['user'],
+            "bags": bags,
+            "weight": weight,
+            "bag_id": bag_id
+        })
+
+        flash(f"Bag Generated: {bag_id}", "success")
         return redirect('/dashboard')
 
-    # ✅ PNR LIST SHOW
-    pnr_list = baggage.distinct("PNR Number")
+    # ONLY ORIGINAL PNR SHOW
+    pnr_list = pnr_data.distinct("PNR Number")
 
     return render_template("checkin.html", pnr_list=pnr_list)
 
-
-# ================= HISTORY =================
 # ================= HISTORY =================
 @app.route('/history')
 def history():
@@ -270,7 +250,7 @@ def baggage_list():
                     "flight": "$Flight Number",
                     "destination": "$Destination"
                 },
-                "total_bags": {"$sum": 1}
+                "total_bags": {"$sum": "$bags"}   # 🔥 FIX HERE
             }
         },
         {
@@ -284,7 +264,6 @@ def baggage_list():
     ]))
 
     return render_template("baggage_list.html", data=data)
-
 
 # ================= STAFF =================
 @app.route('/staff')
