@@ -4,16 +4,15 @@
 
 <h4 class="fw-bold mb-4">Lost Baggage History</h4>
 
-<div class="card shadow p-3">
+<div class="card shadow p-4">
 
     <table class="table table-bordered text-center">
         <thead class="table-dark">
             <tr>
-                <th>Name</th>
-                <th>Bag ID</th>
-                <th>Flight</th>
+                <th>Flight Number</th>
+                <th>Destination</th>
+                <th>Baggage ID</th>
                 <th>Description</th>
-                <th>Contact</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -21,15 +20,14 @@
         <tbody>
             {% for item in data %}
             <tr>
-                <td>{{item.name}}</td>
-                <td>{{item.bag_id}}</td>
                 <td>{{item.flight}}</td>
+                <td>{{item.destination}}</td>
+                <td>{{item.bag_id}}</td>
                 <td>{{item.description}}</td>
-                <td>{{item.contact}}</td>
 
                 <td>
                     <a href="/delete-lost/{{item._id}}" class="btn btn-sm btn-danger"
-                        onclick="return confirm('Delete this report?')">
+                        onclick="return confirm('Delete this record?')">
                         Delete
                     </a>
                 </td>

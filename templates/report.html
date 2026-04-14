@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
 <h4 class="fw-bold mb-4">Report Lost Baggage</h4>
@@ -9,29 +8,42 @@
 
         <form method="POST">
 
+            <!-- PNR -->
+            <div class="mb-3">
+                <label>Select PNR</label>
+                <select name="pnr" id="pnr" class="form-control" onchange="fetchPNR()" required>
+                    <option value="">-- Select PNR --</option>
+                    {% for pnr in pnr_list %}
+                    <option value="{{pnr}}">{{pnr}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- AUTO FILL -->
             <div class="mb-3">
                 <label>Passenger Name</label>
-                <input type="text" name="name" class="form-control" required>
+                <input type="text" id="name" name="name" class="form-control" readonly>
             </div>
 
             <div class="mb-3">
                 <label>Baggage ID</label>
-                <input type="text" name="bag_id" class="form-control" required>
+                <input type="text" id="bag_id" name="bag_id" class="form-control" readonly>
             </div>
 
             <div class="mb-3">
                 <label>Flight Number</label>
-                <input type="text" name="flight" class="form-control" placeholder="EX:AI202" required>
-            </div>
-
-            <div class="mb-3">
-                <label>Description (Color, Type, Brand)</label>
-                <input type="text" name="description" class="form-control" required>
+                <input type="text" id="flight" name="flight" class="form-control" readonly>
             </div>
 
             <div class="mb-3">
                 <label>Contact Number</label>
-                <input type="text" name="contact" class="form-control" required>
+                <input type="text" id="contact" name="contact" class="form-control" readonly>
+            </div>
+
+            <!-- USER INPUT -->
+            <div class="mb-3">
+                <label>Description (Color, Type, Brand)</label>
+                <input type="text" name="description" class="form-control" required>
             </div>
 
             <div class="text-center mt-4">
