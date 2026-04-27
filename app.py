@@ -1,14 +1,27 @@
 from flask import Flask, render_template, request, redirect, flash, session, jsonify
 from pymongo import MongoClient
-from config import MONGO_URI, SECRET_KEY
-import re
+import os
+import random
 from bson.objectid import ObjectId
 
-app = Flask(__name__)
-app.secret_key = SECRET_KEY
+# 🔥 ENV LOAD (Render automatically read karega, local ke liye optional)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except:
+    pass
 
-# DB
+app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", "fallback_key")
+
+# ================= DATABASE =================
+MONGO_URI = os.getenv("MONGO_URI")
+
+if not MONGO_URI:
+    raise Exception("❌ MONGO_URI not found. Check .env")
+
 client = MongoClient(MONGO_URI)
+
 db = client['flyTrack']
 users = db['users']
 baggage = db['baggage']
